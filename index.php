@@ -7,6 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once 'config.php';
 include_once 'refresh_token.php';
 include_once 'auth_check.php';
+include_once 'header.php';
 
 // Hàm tạo URL ảnh game dựa trên tên game
 function getGameImage($title)
@@ -40,7 +41,6 @@ $user = optionalAuth();
     <title>Game Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
     <style>
     * {
         margin: 0;
@@ -50,147 +50,8 @@ $user = optionalAuth();
     }
 
     body {
-        background: #f0f2f5;
+        background: rgb(255, 255, 255);
         color: #1a1a1a;
-    }
-
-    header {
-        background: #fff;
-        padding: 10px 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    header .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-        padding: 5px;
-    }
-
-    .logo img {
-        width: 60px;
-        height: 60px;
-        object-fit: contain;
-        transition: transform 0.2s ease;
-    }
-
-    .logo:hover img {
-        transform: scale(1.05);
-    }
-
-    .nav-buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .nav-btn {
-        padding: 8px 16px;
-        border: none;
-        background: none;
-        cursor: pointer;
-        font-weight: 500;
-        color: #666;
-    }
-
-    .nav-btn.active {
-        color: #ff0000;
-    }
-
-    .search-box {
-        display: flex;
-        align-items: center;
-        background: #f5f5f5;
-        border-radius: 20px;
-        padding: 5px 15px;
-        width: 400px;
-    }
-
-    .search-box input {
-        flex: 1;
-        border: none;
-        background: none;
-        padding: 8px;
-        outline: none;
-        font-size: 14px;
-    }
-
-    .search-box button {
-        border: none;
-        background: none;
-        cursor: pointer;
-        color: #666;
-        padding: 0 5px;
-    }
-
-    .header-right {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .dropdown {
-        position: relative;
-    }
-
-    .dropdown-btn {
-        display: flex;
-        flex-direction: column;
-        background: none;
-        border: none;
-        cursor: pointer;
-        text-align: left;
-        padding: 5px 10px;
-    }
-
-    .subtitle {
-        font-size: 12px;
-        color: #666;
-        margin-top: 2px;
-    }
-
-    .btn-login,
-    .btn-register {
-        padding: 8px 20px;
-        border-radius: 4px;
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    .btn-register {
-        background: #ff0000;
-        color: white;
-    }
-
-    .btn-login {
-        border: 1px solid #ddd;
-        color: #333;
-    }
-
-    .language-btn {
-        border: none;
-        background: none;
-        cursor: pointer;
-        padding: 4px;
-    }
-
-    .language-btn img {
-        width: 24px;
-        height: 24px;
-        border-radius: 2px;
     }
 
     .container {
@@ -324,262 +185,350 @@ $user = optionalAuth();
         background: #388E3C;
     }
 
-    @media (max-width: 768px) {
 
-        .game-grid,
-        .category-grid {
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 1rem;
-        }
 
-        nav ul {
-            gap: 1rem;
-        }
-
-        section h2 {
-            font-size: 1.5rem;
-        }
-
-        .game-title {
-            font-size: 1rem;
-        }
-
+    .game-grid,
+    .category-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
     }
 
+    nav ul {
+        gap: 1rem;
+    }
 
-    /* CSS cho phân trang */
+    section h2 {
+        font-size: 1.5rem;
+    }
+
+    .game-title {
+        font-size: 1rem;
+    }
+
+    /* Pagination */
     .pagination {
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 10px;
-        margin-top: 2rem;
+        margin: 30px 0;
+        background: #ffffff;
+        padding: 10px 20px;
+        border-radius: 50px;
     }
 
     .page-link {
-        padding: 8px 16px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
         text-decoration: none;
-        color: #333;
-        background: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        color: #666;
+        background: #f0f0f0;
         transition: all 0.3s ease;
     }
 
     .page-link:hover {
-        background: #f5f5f5;
-        border-color: #999;
+        background: #e0e0e0;
+        transform: scale(1.05);
     }
 
     .page-link.active {
-        background: #ff0000;
-        color: white;
-        border-color: #ff0000;
+        background: #333;
+        color: #fff;
     }
 
-    .page-link:disabled {
-        opacity: 0.5;
+    .page-arrow {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .page-arrow.disabled {
+        background: #f5f5f5;
+        color: #ccc;
         cursor: not-allowed;
     }
 
-    .footer {
-        background-color: #fff;
-        color: #333;
-        padding: 40px 20px;
-        font-family: 'Arial', sans-serif;
-        border-top: 1px solid #ddd;
-    }
-
-    .footer-content {
+    .page-ellipsis {
         display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
+        align-items: center;
+        font-size: 16px;
+        color: #666;
+        padding: 0 10px;
     }
 
-    .footer-left {
-        width: auto;
-        margin-bottom: 10px;
+    /* Responsive */
+    @media (max-width: 768px) {
+        .pagination {
+            gap: 5px;
+            padding: 8px 15px;
+        }
+
+        .page-link {
+            width: 35px;
+            height: 35px;
+            font-size: 14px;
+        }
     }
 
-    .footer-logo-img {
-        width: 100px;
-        margin-bottom: 10px;
+    .pre-content__wrapper {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
     }
 
-    .footer-left p {
-        color: #999;
-        font-size: 13px;
-        font-weight: 500;
-        letter-spacing: 0;
-        line-height: 16px;
+    .pre-content {
+        background: #ffffff;
+        padding: 40px 0;
+        margin: 40px 0;
+        border: 1px solid #e0e0e0;
     }
 
-    .footer-left a:hover {
-        color: #ff6347;
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
     }
 
-    /* Middle section */
-    .footer-middle {
-        width: auto;
-        margin-bottom: 20px;
-    }
-
-    .footer-middle h3 {
-        color: #333;
-        display: block;
-        font-size: 13px;
-        font-weight: bold;
-        letter-spacing: 0;
-        margin-bottom: 7px;
-        text-transform: uppercase;
-    }
-
-    .footer-middle ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .footer-middle li {
-        margin: 10px 0;
-    }
-
-    .footer-middle a {
-        color: #999;
-        font-size: 13px;
-        font-weight: 500;
-        letter-spacing: 0;
-        line-height: 16px;
-        text-decoration: none;
-    }
-
-
-    /* Right section */
-    .footer-right {
-        width: 30%;
-        margin-bottom: 20px;
-    }
-
-    .footer-right h3 {
-        color: #333;
-        display: block;
-        font-size: 13px;
-        font-weight: bold;
-        letter-spacing: 0;
-        margin-bottom: 7px;
-        text-transform: uppercase;
-    }
-
-    .footer-right ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .footer-right li {
-        margin: 10px 0;
-    }
-
-    .footer-right a {
-        color: #999;
-        font-size: 13px;
-        font-weight: 500;
-        letter-spacing: 0;
-        line-height: 16px;
-        text-decoration: none;
-    }
-
-    /* Follow us section */
-    .footer-follow {
-        width: auto;
+    /* Phần đầu tiên (full width) */
+    .pre-content__wrapper--first {
         text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .footer-follow h3 {
-        color: #333;
-        display: block;
-        font-size: 13px;
-        font-weight: bold;
-        letter-spacing: 0;
-        margin-bottom: 7px;
-        text-transform: uppercase;
-    }
-
-    .social-icons {
+        padding: 40px 20px;
+        margin-bottom: 40px;
         display: flex;
         flex-direction: column;
     }
 
-    .social-icon {
-        font-size: 20px;
-        margin: 0 15px;
-        color: rgb(19, 165, 244);
+    .pre-content__title--black {
+        color: #333;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        line-height: 1.3;
+    }
+
+    .pre-content__description {
+        color: #666;
+        font-size: 1.1rem;
+        font-weight: 400;
+        max-width: 900px;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
+    /* Phần 3 hàng (mỗi cột là một hàng ngang) */
+    .pre-content__columns {
+        display: flex;
+        flex-direction: row;
+        /* Xếp các cột thành hàng dọc */
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    .pre-content__column {
+        padding: 10px;
+        width: 100%;
+        /* Mỗi cột chiếm toàn bộ chiều rộng */
+    }
+
+    .column-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .column-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff;
+    }
+
+    .column-icon--red {
+        background: #ff4d4d;
+    }
+
+    .column-icon--blue {
+        background: #4d94ff;
+    }
+
+    .column-icon--green {
+        background: #4dd2a5;
+    }
+
+    .pre-content__title {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .pre-content__title--red {
+        color: #ff4d4d;
+    }
+
+    .pre-content__title--blue {
+        color: #4d94ff;
+    }
+
+    .pre-content__title--green {
+        color: #4dd2a5;
+    }
+
+    p {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    a {
+        color: #4d94ff;
         text-decoration: none;
-
     }
 
-    .fa,
-    .fa-brands,
-    .fa-duotone,
-    .fa-light,
-    .fa-regular,
-    .fa-solid,
-    .fa-thin,
-    .fab,
-    .fad,
-    .fal,
-    .far,
-    .fas,
-    .fat {
-        -moz-osx-font-smoothing: grayscale;
-        -webkit-font-smoothing: antialiased;
-        display: var(--fa-display, inline-block);
-        font-style: normal;
-        font-variant: normal;
-        line-height: 2;
-        text-rendering: auto;
+    a:hover {
+        text-decoration: underline;
     }
 
+    strong {
+        color: #333;
+    }
 
-    /* Mobile responsiveness */
+    em {
+        font-style: italic;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
-        .footer-content {
-            flex-direction: column;
-            align-items: center;
+        .pre-content__wrapper--first {
+            padding: 30px 15px;
         }
 
-        .footer-left,
-        .footer-middle,
-        .footer-right,
-        .footer-follow {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 20px;
+        .pre-content__title--black {
+            font-size: 1.5rem;
+        }
+
+        .pre-content__description {
+            font-size: 1rem;
+        }
+
+        .pre-content__columns {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+    }
+
+    .filter-section {
+        background: #ffffff;
+        border-radius: 15px;
+        margin: 30px auto;
+        padding: 25px;
+        max-width: 1300px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Categories and Tags Row */
+    .categories-row,
+    .tags-row {
+        margin-bottom: 20px;
+    }
+
+    .filter-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    /* Card Item (category-item và tag-item) */
+    .filter-item {
+        padding: 15px 25px;
+        border-radius: 17px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Ẩn các item ban đầu */
+    .hidden-item {
+        display: none;
+    }
+
+    /* Nút "Tất cả thể loại" và "Tất cả các thẻ" */
+    .show-more-btn {
+        padding: 8px 20px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .show-more-btn:hover {
+        background: #45a049;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    button#showAllCategoriesBtn {
+        padding: 15px 20px;
+        border-radius: 16px;
+        font-size: 15px;
+        background: #d9d9d9;
+        color: grey;
+    }
+
+    button#showAllTagsBtn {
+        padding: 15px 20px;
+        border-radius: 16px;
+        font-size: 15px;
+        background: #d9d9d9;
+        color: grey;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .filter-container {
+            gap: 8px;
+        }
+
+        .filter-item,
+        .show-more-btn {
+            padding: 6px 15px;
+            font-size: 13px;
         }
     }
     </style>
 </head>
-<body>
-    <header>
-        <div class="container">
-            <div class="header-left"><a href="index.php" class="logo"><img src="./assets/image_web/logo.png"
-                        alt="Logo"></a>
-                <div class="search-box"><input type="text" placeholder="Tìm kiếm 90 000 game của chúng tôi"><button
-                        type="submit"><i class="fas fa-search"></i></button></div>
-            </div>
-            <div class="header-right">
-                <div class="dropdown"><button class="dropdown-btn">Thể loại <span class="subtitle">nhiều hơn</span>
-                    </button>
-                </div><?php if ($is_logged_in): ?> <a href="profile.php" class="user-profile">Tài khoản</a> <a
-                    href="logout.php" class="btn-logout">Đăng xuất</a> <?php else: ?> <a href="login.php"
-                    class="btn-login">Đăng nhập</a> <a href="register.php" class="btn-register">Đăng ký</a> <?php endif;
-                ?>
-            </div>
-        </div>
-    </header>
-    <div class="filter-section" style="margin-top:20px; padding: 20px; background: #fff;">
 
+<body>
+    <div class="filter-section">
         <div class="categories-row">
-            <div class="filter-container" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><?php $categories_query = "SELECT * FROM categories";
+            <div class="filter-container">
+                <?php
+            $categories_query = "SELECT * FROM categories";
             $categories_result = $conn->query($categories_query);
             $all_categories = [];
 
@@ -587,31 +536,28 @@ $user = optionalAuth();
                 $all_categories[] = $category;
             }
 
-            // Hiển thị 5 categories đầu tiên
-            for ($i = 0; $i < min(5, count($all_categories)); $i++):
+            // Hiển thị tất cả categories (ban đầu ẩn các item từ thứ 6 trở đi)
+            for ($i = 0; $i < count($all_categories); $i++):
                 $category = $all_categories[$i];
+                $isHidden = $i >= 6 ? 'hidden-item' : ''; // Ẩn từ item thứ 6 trở đi
                 ?>
-                <div class="category-item filter-item"
-                    style="padding: 5px 15px; background: #e0e0e0; border-radius: 20px; font-size: 14px; cursor: pointer;"><?php echo htmlspecialchars($category['name']);
-                        ?></div><?php endfor;
-            ?><?php if (count($all_categories) > 5): ?><button id="showAllCategoriesBtn" onclick="toggleCategories()"
-                    class="show-more-btn"
-                    style="padding: 5px 15px; background: #4CAF50; color: white; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; white-space: nowrap;">Tất
-                    cả thể loại </button>
+                <div class="category-item filter-item <?php echo $isHidden; ?>">
+                    <?php echo htmlspecialchars($category['name']); ?>
+                </div>
+                <?php endfor; ?>
 
-                <div id="categoriesExpandedContainer" style="display: contents;"><?php for ($i = 5; $i < count($all_categories); $i++):
-                        $category = $all_categories[$i];
-                        ?>
-                    <div class="category-item filter-item hidden-item"
-                        style="display: none; padding: 5px 15px; background: #e0e0e0; border-radius: 20px; font-size: 14px; cursor: pointer;"><?php echo htmlspecialchars($category['name']);
-                                ?></div><?php endfor;
-                    ?>
-                </div><?php endif;
-            ?>
+                <?php if (count($all_categories) > 6): ?>
+                <button id="showAllCategoriesBtn" onclick="toggleCategories()" class="show-more-btn">
+                    Tất cả thể loại
+                </button>
+                <?php endif; ?>
             </div>
         </div>
-        <div class="tags-row" style="margin-top: 10px;">
-            <div class="filter-container" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;"><?php $tags_query = "SELECT * FROM tags";
+
+        <div class="tags-row">
+            <div class="filter-container">
+                <?php
+            $tags_query = "SELECT * FROM tags";
             $tags_result = $conn->query($tags_query);
             $all_tags = [];
 
@@ -619,241 +565,294 @@ $user = optionalAuth();
                 $all_tags[] = $tag;
             }
 
-            // Hiển thị 5 tags đầu tiên
-            for ($i = 0; $i < min(5, count($all_tags)); $i++):
+            // Hiển thị tất cả tags (ban đầu ẩn các item từ thứ 6 trở đi)
+            for ($i = 0; $i < count($all_tags); $i++):
                 $tag = $all_tags[$i];
+                $isHidden = $i >= 7 ? 'hidden-item' : ''; // Ẩn từ item thứ 6 trở đi
                 ?>
-                <div class="tag-item filter-item"
-                    style="padding: 5px 15px; background: #e0e0e0; border-radius: 20px; font-size: 14px; cursor: pointer;"><?php echo htmlspecialchars($tag['name']);
-                        ?></div><?php endfor;
-            ?><?php if (count($all_tags) > 5): ?><button id="showAllTagsBtn" onclick="toggleTags()"
-                    class="show-more-btn"
-                    style="padding: 5px 15px; background: #4CAF50; color: white; border: none; border-radius: 20px; font-size: 14px; cursor: pointer; white-space: nowrap;">Tất
-                    cả các thẻ </button>
-                <div id="tagsExpandedContainer" style="display: contents;"><?php for ($i = 5; $i < count($all_tags); $i++):
-                        $tag = $all_tags[$i];
-                        ?>
-                    <div class="tag-item filter-item hidden-item"
-                        style="display: none; padding: 5px 15px; background: #e0e0e0; border-radius: 20px; font-size: 14px; cursor: pointer;"><?php echo htmlspecialchars($tag['name']);
-                                ?></div><?php endfor;
-                    ?>
-                </div><?php endif;
-            ?>
+                <div class="tag-item filter-item <?php echo $isHidden; ?>">
+                    <?php echo htmlspecialchars($tag['name']); ?>
+                </div>
+                <?php endfor; ?>
+
+                <?php if (count($all_tags) > 7): ?>
+                <button id="showAllTagsBtn" class="show-more-btn">
+                    <a href="tags.php" style="text-decoration: none;">
+                        Tất cả các thẻ
+                    </a>
+                </button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
     <main class="container">
         <section class="featured-games">
-            <div class="game-grid"><?php // Xác định trang hiện tại
-            $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-            $per_page = 2020;
-            $offset = ($page - 1) * $per_page;
+            <div class="game-grid">
+                <?php
+        // Xác định trang hiện tại
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $per_page = 1; // Giảm số lượng game mỗi trang để dễ kiểm tra phân trang
+        $offset = ($page - 1) * $per_page;
 
-            // Lấy tổng số game
-            $total_query = "SELECT COUNT(*) as total FROM games";
-            $total_result = $conn->query($total_query);
-            $total_games = $total_result->fetch_assoc()['total'];
-            $total_pages = ceil($total_games / $per_page);
+        // Lấy tổng số game
+        $total_query = "SELECT COUNT(*) as total FROM games";
+        $total_result = $conn->query($total_query);
+        $total_games = $total_result->fetch_assoc()['total'];
+        $total_pages = ceil($total_games / $per_page);
 
-            // Lấy danh sách game với phân trang
-            $featured_query = "SELECT * FROM games ORDER BY created_at DESC LIMIT ? OFFSET ?";
-            $stmt = $conn->prepare($featured_query);
-            $stmt->bind_param("ii", $per_page, $offset);
-            $stmt->execute();
-            $featured_result = $stmt->get_result();
+        // Lấy danh sách game với phân trang
+        $featured_query = "SELECT * FROM games ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        $stmt = $conn->prepare($featured_query);
+        $stmt->bind_param("ii", $per_page, $offset);
+        $stmt->execute();
+        $featured_result = $stmt->get_result();
 
-            if ($featured_result->num_rows > 0):
-                while ($game = $featured_result->fetch_assoc()):
-                    $gameImage = getGameImage($game['title']);
-                    ?><a href="game.php?id=<?php echo $game['id']; ?>" class="game-card"><img
-                        src="<?php echo $gameImage; ?>" alt="<?php echo htmlspecialchars($game['title']); ?>"
+        if ($featured_result->num_rows > 0):
+            while ($game = $featured_result->fetch_assoc()):
+                $gameImage = getGameImage($game['title']);
+                ?>
+                <a href="game.php?id=<?php echo $game['id']; ?>" class="game-card">
+                    <img src="<?php echo $gameImage; ?>" alt="<?php echo htmlspecialchars($game['title']); ?>"
                         class="game-image">
-                    <h3 class="game-title"><?php echo htmlspecialchars($game['title']);
-                            ?></h3>
+                    <h3 class="game-title"><?php echo htmlspecialchars($game['title']); ?></h3>
                     <div class="game-overlay">
                         <div class="play-text">Chơi Ngay</div>
                     </div>
-                </a><?php endwhile;
-            else: ?>
-                <p>Chưa có game nổi bật.</p><?php endif;
+                </a>
+                <?php
+            endwhile;
+        else:
             ?>
+                <p>Chưa có game nổi bật.</p>
+                <?php endif; ?>
             </div>
-            <?php if ($total_pages > 1): ?>
-            <div class="pagination"><?php if ($page > 1): ?><a href="?page=<?php echo ($page - 1); ?>"
-                    class="page-link">Trước</a><?php endif;
-                ?><?php for ($i = 1; $i <= $total_pages; $i++): ?><a href="?page=<?php echo $i; ?>"
-                    class="page-link <?php echo ($i === $page) ? 'active' : ''; ?>"><?php echo $i;
-                                     ?></a><?php endfor;
-                ?><?php if ($page < $total_pages): ?><a href="?page=<?php echo ($page + 1); ?>"
-                    class="page-link">Sau</a><?php endif;
-                ?></div><?php endif;
 
+            <?php if ($total_pages > 1): ?>
+            <div class="pagination">
+                <!-- Nút "Trước" -->
+                <?php if ($page > 1): ?>
+                <a href="?page=<?php echo ($page - 1); ?>" class="page-link page-arrow">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <?php else: ?>
+                <span class="page-link page-arrow disabled">
+                    <i class="fas fa-chevron-left"></i>
+                </span>
+                <?php endif; ?>
+
+                <!-- Hiển thị số trang -->
+                <?php
+        $max_visible_pages = 3; // Số trang tối đa hiển thị trước khi thêm dấu "..."
+        $start_page = max(1, $page - 1);
+        $end_page = min($total_pages, $start_page + $max_visible_pages - 1);
+
+        // Điều chỉnh start_page nếu gần cuối
+        if ($end_page - $start_page + 1 < $max_visible_pages) {
+            $start_page = max(1, $end_page - $max_visible_pages + 1);
+        }
+
+        // Hiển thị các số trang
+        for ($i = $start_page; $i <= $end_page; $i++):
             ?>
+                <a href="?page=<?php echo $i; ?>" class="page-link <?php echo ($i === $page) ? 'active' : ''; ?>">
+                    <?php echo $i; ?>
+                </a>
+                <?php endfor; ?>
+
+                <!-- Dấu "..." nếu có nhiều trang hơn */
+        <?php if ($end_page < $total_pages): ?>
+            <span class="page-ellipsis">...</span>
+            <a href="?page=<?php echo $total_pages; ?>" class="page-link">
+                <?php echo $total_pages; ?>
+            </a>
+        <?php endif; ?>
+
+        <!-- Nút "Sau" -->
+                <?php if ($page < $total_pages): ?>
+                <a href="?page=<?php echo ($page + 1); ?>" class="page-link page-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                <?php else: ?>
+                <span class="page-link page-arrow disabled">
+                    <i class="fas fa-chevron-right"></i>
+                </span>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </section>
     </main>
     <div class="pre-content pre-content--border pre-content--homepage">
         <div class="container">
             <div class="pre-content__wrapper pre-content__wrapper--first">
-                <h1 class="pre-content__title pre-content__title--black">Trò chơi Trực tuyến Miễn phí dành cho Mọi lứa
-                    tuổi - Bắt đầu Chơi ngay hôm nay ! </h1>
-                <h2 class="pre-content__description">Khám phá các Trò chơi Trực tuyến Miễn phí Hay nhất - Đắm chìm trong
-                    thế giới vui nhộn và phiêu lưu. Khám phá hàng nghìn trò chơi thú vị và bắt đầu chơi ngay ! </h2>
+                <h1 class="pre-content__title pre-content__title--black">
+                    Trò chơi Trực tuyến Miễn phí dành cho Mọi lứa tuổi - Bắt đầu Chơi ngay hôm nay!
+                </h1>
+                <h2 class="pre-content__description">
+                    Khám phá các Trò chơi Trực tuyến Miễn phí Hay nhất - Đắm chìm trong thế giới vui nhộn và phiêu lưu.
+                    Khám phá hàng nghìn trò chơi thú vị và bắt đầu chơi ngay!
+                </h2>
             </div>
-            <div class="pre-content__wrapper">
+            <div class="pre-content__wrapper pre-content__columns">
                 <div class="pre-content__column">
-                    <h2 class="pre-content__title pre-content__title--red">Y8 là gì?</h2>
-                    <h3>Hơn 15 năm chơi game trên Internet tại Y8.com</h3>
-                    <p>Bạn có biết rằng Y8 đã cung cấp <strong>game trực tuyến miễn phí</strong>và <strong>câu
-                            đố</strong>từ năm 2006 không? Vậy là hơn 15 năm Y8.com <strong>vui vẻ</strong> ! Cảm ơn bạn
-                        đã là một phần của cộng đồng Y8 !</p>
-                    <h3>Y8: Trang web trò chơi cuối của bạn</h3>
-                    <p>Games Y8 là <strong>nhà phát hành game</strong>và <strong>nhà triển khai game</strong>. Nền tảng
-                        Y8 có <strong>mạng xã hội</strong>với 30 triệu người chơi và đang tiếp tục phát triển. Trang web
-                        này cũng có <a href="https://vi.y8.com/anim">video để xem</a>như phim hoạt hình,
-                        video <strong>cách chơi game</strong>và hướng dẫn <strong>game</strong>. danh mục truyền thông
-                        đang phát triển hàng ngày khi <a href="https://vi.y8.com/new/games">trò chơi mới</a>được phát
-                        hành hàng giờ. </p>
-                    <h3>Sự Phát triển của Game Trình duyệt</h3>
-                    <p>Vì Y8.com có lịch sử lâu đời nên chúng tôi đã ghi lại hiện tượng xã hội về <strong>game trình
-                            duyệt miễn phí</strong>vì <strong>game</strong>là một phương tiện nghệ thuật quan trọng và
-                        có thể giải thích xem mọi người như thế nào trong một khoảng thời gian khác nhau.</p>
-                </div>
-                <div class="pre-content__column">
-                    <h2 class="pre-content__title pre-content__title--blue">Thể loại game</h2>
-                    <h3>Danh mục Game Trực tuyến Mới Phát sinh</h3>
-                    <p>Trước đây,
-                        Y8 nổi tiếng với các thể loại như <strong>game arcade và cổ điển</strong>khi <a
-                            href="https://vi.y8.com/tags/bubble_shooter">Bubble Bắn súng</a>là *<em>game trên trình
-                            duyệt được chơi nhiều nhất *</em>. Bây giờ,
-                        các thể loại khác đã trở nên phổ biến.</p>
-                    <h3>Khám phá những cái Hay nhất trong Game nhiều Người chơi</h3>
-                    <p>Đáng chú ý,
-                        <a href="https://vi.y8.com/tags/2_players">games 2 người</a>đã trở thành <strong>games trên
-                            trình duyệt phổ biến</strong>với <a href="https://vi.y8.com/tags/dress_up">games phối
-                            đồ</a>. phần <strong>game</strong>quan trọng cuối cùng là <a
-                            href="https://vi.y8.com/tags/multiplayer">game nhiều người chơi</a>. Chơi danh mục mở rộng
-                        của <strong>game xã hội</strong>được kích hoạt trên <strong>Internet</strong>.
+                    <div class="column-header">
+                        <span class="column-icon column-icon--red">?</span>
+                        <h2 class="pre-content__title pre-content__title--red">Y8 là gì?</h2>
+                    </div>
+                    <p>
+                        Hơn 15 năm chơi game trên Internet tại Y8.com<br>
+                        Bạn có biết rằng Y8 đã cung cấp <strong>game trực tuyến miễn phí</strong> và <strong>câu
+                            đố</strong> từ năm 2006 không? Vậy là hơn 15 năm Y8.com <strong>vui vẻ</strong>! Cảm ơn bạn
+                        đã là một phần của cộng đồng Y8!
+                    </p>
+                    <p>
+                        Y8: Trang web trò chơi cuối của bạn<br>
+                        Games Y8 là <strong>nhà phát hành game</strong> và <strong>nhà triển khai game</strong>. Nền
+                        tảng Y8 có <strong>mạng xã hội</strong> với 30 triệu người chơi và đang tiếp tục phát triển.
+                        Trang web này cũng có <a href="https://vi.y8.com/anim">video để xem</a> như phim hoạt hình,
+                        video <strong>cách chơi game</strong> và hướng dẫn <strong>game</strong>. Danh mục truyền thông
+                        đang phát triển hàng ngày khi <a href="https://vi.y8.com/new/games">trò chơi mới</a> được phát
+                        hành hàng giờ.
+                    </p>
+                    <p>
+                        Sự Phát triển của Game Trình duyệt<br>
+                        Vì Y8.com có lịch sử lâu đời nên chúng tôi đã ghi lại hiện tượng xã hội về <strong>game trình
+                            duyệt miễn phí</strong> vì <strong>game</strong> là một phương tiện nghệ thuật quan trọng và
+                        có thể giải thích xem mọi người như thế nào trong một khoảng thời gian khác nhau.
                     </p>
                 </div>
                 <div class="pre-content__column">
-                    <h2 class="pre-content__title pre-content__title--green">Công nghệ</h2>
-                    <h3>Điểm đến Yêu thích để chơi Game trên nhiều Thiết bị</h3>
-                    <p>Y8.com là ngôi nhà dành cho <strong>game thủ</strong>trên mọi thiết bị. Chơi <a
-                            href="https://vi.y8.com/tags/touchscreen">game trên điện thoại</a>hoặc nhận đồ họa 3D phong
+                    <div class="column-header">
+                        <span class="column-icon column-icon--blue">•••</span>
+                        <h2 class="pre-content__title pre-content__title--blue">Thể loại game</h2>
+                    </div>
+                    <p>
+                        Danh mục Game Trực tuyến Mới Phát sinh<br>
+                        Trước đây, Y8 nổi tiếng với các thể loại như <strong>game arcade và cổ điển</strong> khi <a
+                            href="https://vi.y8.com/tags/bubble_shooter">Bubble Bắn súng</a> là <em>game trên trình
+                            duyệt được chơi nhiều nhất</em>. Bây giờ, các thể loại khác đã trở nên phổ biến.
+                    </p>
+                    <p>
+                        Khám phá những cái Hay nhất trong Game nhiều Người chơi<br>
+                        Đáng chú ý, <a href="https://vi.y8.com/tags/2_players">games 2 người</a> đã trở thành
+                        <strong>games trên trình duyệt phổ biến</strong> với <a
+                            href="https://vi.y8.com/tags/dress_up">games phối đồ</a>. Phần <strong>game</strong> quan
+                        trọng cuối cùng là <a href="https://vi.y8.com/tags/multiplayer">game nhiều người chơi</a>. Chơi
+                        danh mục mở rộng của <strong>game xã hội</strong> được kích hoạt trên <strong>Internet</strong>.
+                    </p>
+                </div>
+                <div class="pre-content__column">
+                    <div class="column-header">
+                        <span class="column-icon column-icon--green">◆</span>
+                        <h2 class="pre-content__title pre-content__title--green">Công nghệ</h2>
+                    </div>
+                    <p>
+                        Điểm đến Yêu thích để chơi Game trên nhiều Thiết bị<br>
+                        Y8.com là ngôi nhà dành cho <strong>game thủ</strong> trên mọi thiết bị. Chơi <a
+                            href="https://vi.y8.com/tags/touchscreen">game trên điện thoại</a> hoặc nhận đồ họa 3D phong
                         phú trên máy tính để bàn bằng cách chơi <a href="https://vi.y8.com/tags/webgl">trò chơi
-                            webgl</a>.</p>
-                    <h3>Mạng trò chơi mở rộng</h3>
-                    <p>Mặt khác,
-                        nếu sở thích của bạn là thế giới 2D thông thường thì <a href="https://vi.y8.com/tags/html5">game
-                            HTML5</a>sẽ phù hợp với bạn. Nếu bạn muốn khơi dậy hoài niệm,
-                        hãy truy cập kho lưu trữ <a href="https://vi.y8.com/tags/flash">trò chơi flash</a>kế thừa để
-                        biết tất cả <strong>game</strong>mà hiện chưa có ở nơi nào khác.</p>
-                    <h3>Kết nối với Cộng đồng Người chơi</h3>
-                    <p>Cuối cùng,
-                        đừng quên đăng ký <a href="https://account.y8.com/">Tài khoản Y8</a>. Đó là <strong>mạng xã
-                            hội</strong>hỗ trợ <strong>cộng đồng người chơi</strong>. </p>
+                            webgl</a>.
+                    </p>
+                    <p>
+                        Mạng trò chơi mở rộng<br>
+                        Mặt khác, nếu sở thích của bạn là thế giới 2D thông thường thì <a
+                            href="https://vi.y8.com/tags/html5">game HTML5</a> sẽ phù hợp với bạn. Nếu bạn muốn khơi dậy
+                        hoài niệm, hãy truy cập kho lưu trữ <a href="https://vi.y8.com/tags/flash">trò chơi flash</a> kế
+                        thừa để biết tất cả <strong>game</strong> mà hiện chưa có ở nơi nào khác.
+                    </p>
+                    <p>
+                        Kết nối với Cộng đồng Người chơi<br>
+                        Cuối cùng, đừng quên đăng ký <a href="https://account.y8.com/">Tài khoản Y8</a>. Đó là
+                        <strong>mạng xã hội</strong> hỗ trợ <strong>cộng đồng người chơi</strong>.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-    <footer class="footer">
-        <div class="footer-content">
-
-            <div class="footer-left">
-                <div class="footer-logo"><img src="./assets/image_web/logo.png" alt="Logo" class="footer-logo-img">
-                </div>
-            </div>
-
-            <div class="footer-middle">
-                <h3>Trò Chơi Trực Tuyến Miễn Phí Tại Y8</h3>
-                <ul>
-                    <li><a href="#">Game Miễn Phí Trực Tuyến Mới</a></li>
-                    <li><a href="#">Game Miễn Phí Trực Tuyến Hay Nhất</a></li>
-                    <li><a href="#">Game Miễn Phí Trực Tuyến Phổ Biến</a></li>
-                    <li><a href="#">Trình Duyệt Y8 (để chơi Game Flash)</a></li>
-                    <li><a href="#">Các Studio Game Trình Duyệt</a></li>
-                    <li><a href="#">Tải Lên</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-right">
-                <h3>Công Ty</h3>
-                <ul>
-                    <li><a href="#">Điều Khoản Sử Dụng</a></li>
-                    <li><a href="#">Chính Sách Bảo Mật</a></li>
-                    <li><a href="#">Chính Sách Cookie</a></li>
-                    <li><a href="#">Nhà Phát Hành Game</a></li>
-                    <li><a href="#">Các Nhà Phát Triển Game</a></li>
-                    <li><a href="#">Gửi Tin Nhắn Cho Chúng Tôi</a></li>
-                    <li><a href="#">Gửi Mail Cho Chúng Tôi</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-follow">
-                <h3>Theo Dõi Chúng Tôi</h3>
-                <div class="social-icons"><a href="#" class="social-icon"><i class="fab fa-twitter"></i></a><a href="#"
-                        class="social-icon"><i class="fab fa-facebook"></i></a><a href="#" class="social-icon"><i
-                            class="fab fa-instagram"></i></a><a href="#" class="social-icon"><i
-                            class="fab fa-youtube"></i></a></div>
-            </div>
-        </div>
-    </footer>
+    <?php include_once 'footer.php' ?>
     <script>
+    const colors = [
+        '#ff8c66', // Cam nhạt 
+        '#ff66b3', // Hồng 
+        '#cc66ff', // Tím 
+        '#66ff99', // Xanh lá 
+        '#66ccff', // Xanh lam 
+        '#ff6666', // Đỏ 
+        '#ffcc66', // Vàng 
+
+    ];
+
+    // Lưu trữ màu đã sử dụng
+    let usedColors = [];
+
+    // Hàm chọn màu ngẫu nhiên không trùng với màu đã sử dụng
+    function getRandomColor(excludeColors) {
+        let availableColors = colors.filter(color => !excludeColors.includes(color));
+        if (availableColors.length === 0) {
+            // Nếu đã dùng hết màu, reset danh sách màu đã sử dụng
+            availableColors = [...colors];
+            excludeColors.length = 0; // Reset excludeColors
+        }
+        const randomIndex = Math.floor(Math.random() * availableColors.length);
+        const selectedColor = availableColors[randomIndex];
+        excludeColors.push(selectedColor); // Thêm màu đã chọn vào danh sách đã sử dụng
+        return selectedColor;
+    }
+
+    // Áp dụng màu cho các item ban đầu
+    function applyInitialColors() {
+        const initialItems = document.querySelectorAll('.filter-item:not(.hidden-item)');
+        initialItems.forEach(item => {
+            const color = getRandomColor(usedColors);
+            item.style.backgroundColor = color;
+        });
+    }
+
+    // Áp dụng màu cho các item ẩn (khi mở rộng)
+    function applyHiddenColors(hiddenItems) {
+        hiddenItems.forEach(item => {
+            const color = getRandomColor(usedColors);
+            item.style.backgroundColor = color;
+        });
+    }
+
+    // Gọi hàm khi trang được tải
+    document.addEventListener('DOMContentLoaded', applyInitialColors);
+
+    // Hàm toggleCategories
     function toggleCategories() {
         const button = document.getElementById('showAllCategoriesBtn');
         const hiddenItems = document.querySelectorAll('.categories-row .hidden-item');
         const isExpanded = button.getAttribute('data-expanded') === 'true';
-        const container = document.getElementById('categoriesExpandedContainer');
 
         hiddenItems.forEach(item => {
-                item.style.display = isExpanded ? 'none' : 'block';
-            }
+            item.style.display = isExpanded ? 'none' : 'inline-block';
+        });
 
-        );
-
-        if (isExpanded) {
-            button.textContent = 'Xem thêm';
-            // Di chuyển nút về vị trí sau item thứ 5
-            const fifthItem = document.querySelector('.categories-row .filter-item:nth-child(5)');
-
-            if (fifthItem) {
-                fifthItem.after(button);
-            }
-        } else {
-            button.textContent = 'Ẩn bớt';
-            // Di chuyển nút về cuối container
-            container.after(button);
+        if (!isExpanded) {
+            // Chỉ áp dụng màu cho các item ẩn khi mở rộng lần đầu
+            applyHiddenColors(hiddenItems);
         }
 
+        button.textContent = isExpanded ? 'Tất cả thể loại' : 'Ẩn bớt';
         button.setAttribute('data-expanded', !isExpanded);
     }
 
+    // Hàm toggleTags
     function toggleTags() {
         const button = document.getElementById('showAllTagsBtn');
         const hiddenItems = document.querySelectorAll('.tags-row .hidden-item');
         const isExpanded = button.getAttribute('data-expanded') === 'true';
-        const container = document.getElementById('tagsExpandedContainer');
 
         hiddenItems.forEach(item => {
-                item.style.display = isExpanded ? 'none' : 'block';
-            }
+            item.style.display = isExpanded ? 'none' : 'inline-block';
+        });
 
-        );
-
-        if (isExpanded) {
-            button.textContent = 'Xem thêm';
-            // Di chuyển nút về vị trí sau item thứ 5
-            const fifthItem = document.querySelector('.tags-row .filter-item:nth-child(5)');
-
-            if (fifthItem) {
-                fifthItem.after(button);
-            }
-        } else {
-            button.textContent = 'Ẩn bớt';
-            // Di chuyển nút về cuối container
-            container.after(button);
+        if (!isExpanded) {
+            // Chỉ áp dụng màu cho các item ẩn khi mở rộng lần đầu
+            applyHiddenColors(hiddenItems);
         }
 
+        button.textContent = isExpanded ? 'Tất cả các thẻ' : 'Ẩn bớt';
         button.setAttribute('data-expanded', !isExpanded);
     }
     </script>
