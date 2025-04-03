@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'config.php';
-
+include 'refresh_token.php';
 // Kiểm tra và lọc game_id
 $game_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$game_id) {

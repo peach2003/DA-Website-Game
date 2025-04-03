@@ -1,7 +1,7 @@
 <?php
 session_start();
 include 'config.php';
-
+include 'refresh_token.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {

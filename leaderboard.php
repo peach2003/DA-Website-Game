@@ -1,7 +1,7 @@
 <?php
 session_start();
 include 'config.php';
-
+include 'refresh_token.php';
 $game_id = isset($_GET['game_id']) ? intval($_GET['game_id']) : null;
 
 // Lấy danh sách game để hiển thị dropdown

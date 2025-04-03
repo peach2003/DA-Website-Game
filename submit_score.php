@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'config.php';
+include 'refresh_token.php';
 
 header('Content-Type: application/json');
 
