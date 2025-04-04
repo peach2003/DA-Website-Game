@@ -50,6 +50,7 @@ include_once 'header.php';
     text-align: center;
     border: 2px solid;
     /* Thêm border */
+    text-decoration: none;
 }
 
 .tag-item:hover {
@@ -84,9 +85,10 @@ include_once 'header.php';
             ];
             $randomColor = $colors[array_rand($colors)];
         ?>
-        <div class="tag-item" style="border-color: <?php echo $randomColor; ?>">
+        <a href="list_game_tag.php?id=<?php echo $tag['id']; ?>" class="tag-item"
+            style="border-color: <?php echo $randomColor; ?>">
             <?php echo htmlspecialchars($tag['name']); ?>
-        </div>
+        </a>
         <?php endwhile; ?>
     </div>
 </div>
@@ -94,5 +96,5 @@ include_once 'header.php';
 <?php include_once 'footer.php'; ?>
 
 <script>
-// Có thể thêm các hiệu ứng JavaScript nếu cần
+
 </script>

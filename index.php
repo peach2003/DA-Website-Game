@@ -9,24 +9,7 @@ include_once 'refresh_token.php';
 include_once 'auth_check.php';
 include_once 'header.php';
 
-// Hàm tạo URL ảnh game dựa trên tên game
-function getGameImage($title)
-{
-    $gameImages = [
-        'pacman' => 'https://th.bing.com/th/id/R.5e2f2399be25799401513ea1fcbac5ba?rik=avMBew%2bAzW27Og&riu=http%3a%2f%2fcdn.cnn.com%2fcnnnext%2fdam%2fassets%2f200518114838-05-pac-man-40.jpg&ehk=rDP9NuHnVcOvu8xJW0I4ADgb%2fnsMQk8r5wA5eUNHZtA%3d&risl=&pid=ImgRaw&r=0',
-        'flappybird' => 'https://danviet.mediacdn.vn/296231569849192448/2023/8/5/hanh-trinh-flappy-bird-nguyen-ha-dong-1691264866444132753304.jpeg',
-        'snake' => 'https://play-lh.googleusercontent.com/v8w4fmZli_DKkn9tN5P_tr0Wvky4zVjSf0pmd9VATiRJV-yfpI9cDwnpAMmpMh3tz94',
-        'breakout' => 'https://th.bing.com/th/id/OIP.UX9SuvFo0NsIKUgHAYxIuQHaFj?rs=1&pid=ImgDetMain'
-    ];
 
-    // Chuyển tên game thành chữ thường và bỏ khoảng trắng
-    $cleanTitle = strtolower(str_replace(' ', '', $title));
-
-    // Trả về URL ảnh tương ứng hoặc ảnh mặc định
-    return isset($gameImages[$cleanTitle])
-        ? $gameImages[$cleanTitle]
-        : 'https://img.freepik.com/premium-vector/video-game-controller-neon-sign-night-bright-advertisement_99087-158.jpg';
-}
 
 // Lấy thông tin người dùng đã đăng nhập (nếu có)
 $user = optionalAuth();
@@ -56,7 +39,7 @@ $user = optionalAuth();
 
     .container {
         max-width: 1200px;
-        margin: 2rem auto;
+        margin: 10px auto;
         padding: 0 1rem;
     }
 
@@ -74,9 +57,22 @@ $user = optionalAuth();
     .game-grid,
     .category-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(6, 1fr);
         gap: 1.5rem;
         padding: 1rem;
+    }
+
+    .category-item a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .category-item:hover a {
+        transform: translateY(-2px);
+        text-decoration: none;
     }
 
     .game-card {
@@ -288,11 +284,7 @@ $user = optionalAuth();
         border: 1px solid #e0e0e0;
     }
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
+
 
     /* Phần đầu tiên (full width) */
     .pre-content__wrapper--first {
@@ -465,11 +457,18 @@ $user = optionalAuth();
     .filter-item:hover {
         transform: translateY(-3px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
     }
 
     /* Ẩn các item ban đầu */
     .hidden-item {
         display: none;
+    }
+
+    .game-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     /* Nút "Tất cả thể loại" và "Tất cả các thẻ" */
@@ -492,6 +491,7 @@ $user = optionalAuth();
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
+
     button#showAllCategoriesBtn {
         padding: 15px 20px;
         border-radius: 16px;
@@ -505,6 +505,11 @@ $user = optionalAuth();
         border-radius: 16px;
         font-size: 15px;
         background: #d9d9d9;
+        color: grey;
+    }
+
+    button#showAllTagsBtn a {
+
         color: grey;
     }
 
@@ -528,21 +533,23 @@ $user = optionalAuth();
         <div class="categories-row">
             <div class="filter-container">
                 <?php
-            $categories_query = "SELECT * FROM categories";
-            $categories_result = $conn->query($categories_query);
-            $all_categories = [];
+                $categories_query = "SELECT * FROM categories";
+                $categories_result = $conn->query($categories_query);
+                $all_categories = [];
 
-            while ($category = $categories_result->fetch_assoc()) {
-                $all_categories[] = $category;
-            }
+                while ($category = $categories_result->fetch_assoc()) {
+                    $all_categories[] = $category;
+                }
 
-            // Hiển thị tất cả categories (ban đầu ẩn các item từ thứ 6 trở đi)
-            for ($i = 0; $i < count($all_categories); $i++):
-                $category = $all_categories[$i];
-                $isHidden = $i >= 6 ? 'hidden-item' : ''; // Ẩn từ item thứ 6 trở đi
-                ?>
+                // Hiển thị tất cả categories (ban đầu ẩn các item từ thứ 6 trở đi)
+                for ($i = 0; $i < count($all_categories); $i++):
+                    $category = $all_categories[$i];
+                    $isHidden = $i >= 6 ? 'hidden-item' : ''; // Ẩn từ item thứ 6 trở đi
+                    ?>
                 <div class="category-item filter-item <?php echo $isHidden; ?>">
-                    <?php echo htmlspecialchars($category['name']); ?>
+                    <a href="category.php?id=<?php echo $category['id']; ?>">
+                        <?php echo htmlspecialchars($category['name']); ?>
+                    </a>
                 </div>
                 <?php endfor; ?>
 
@@ -557,22 +564,23 @@ $user = optionalAuth();
         <div class="tags-row">
             <div class="filter-container">
                 <?php
-            $tags_query = "SELECT * FROM tags";
-            $tags_result = $conn->query($tags_query);
-            $all_tags = [];
+                $tags_query = "SELECT * FROM tags";
+                $tags_result = $conn->query($tags_query);
+                $all_tags = [];
 
-            while ($tag = $tags_result->fetch_assoc()) {
-                $all_tags[] = $tag;
-            }
+                while ($tag = $tags_result->fetch_assoc()) {
+                    $all_tags[] = $tag;
+                }
 
-            // Hiển thị tất cả tags (ban đầu ẩn các item từ thứ 6 trở đi)
-            for ($i = 0; $i < count($all_tags); $i++):
-                $tag = $all_tags[$i];
-                $isHidden = $i >= 7 ? 'hidden-item' : ''; // Ẩn từ item thứ 6 trở đi
-                ?>
-                <div class="tag-item filter-item <?php echo $isHidden; ?>">
+                // Hiển thị tất cả tags (ban đầu ẩn các item từ thứ 6 trở đi)
+                for ($i = 0; $i < count($all_tags); $i++):
+                    $tag = $all_tags[$i];
+                    $isHidden = $i >= 7 ? 'hidden-item' : ''; // Ẩn từ item thứ 6 trở đi
+                    ?>
+                <a href="list_game_tag.php?id=<?php echo $tag['id']; ?>"
+                    class="tag-item filter-item <?php echo $isHidden; ?>">
                     <?php echo htmlspecialchars($tag['name']); ?>
-                </div>
+                </a>
                 <?php endfor; ?>
 
                 <?php if (count($all_tags) > 7): ?>
@@ -589,40 +597,41 @@ $user = optionalAuth();
         <section class="featured-games">
             <div class="game-grid">
                 <?php
-        // Xác định trang hiện tại
-        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-        $per_page = 1; // Giảm số lượng game mỗi trang để dễ kiểm tra phân trang
-        $offset = ($page - 1) * $per_page;
+                // Xác định trang hiện tại
+                $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+                $per_page = 1; // Giảm số lượng game mỗi trang để dễ kiểm tra phân trang
+                $offset = ($page - 1) * $per_page;
 
-        // Lấy tổng số game
-        $total_query = "SELECT COUNT(*) as total FROM games";
-        $total_result = $conn->query($total_query);
-        $total_games = $total_result->fetch_assoc()['total'];
-        $total_pages = ceil($total_games / $per_page);
+                // Lấy tổng số game
+                $total_query = "SELECT COUNT(*) as total FROM games";
+                $total_result = $conn->query($total_query);
+                $total_games = $total_result->fetch_assoc()['total'];
+                $total_pages = ceil($total_games / $per_page);
 
-        // Lấy danh sách game với phân trang
-        $featured_query = "SELECT * FROM games ORDER BY created_at DESC LIMIT ? OFFSET ?";
-        $stmt = $conn->prepare($featured_query);
-        $stmt->bind_param("ii", $per_page, $offset);
-        $stmt->execute();
-        $featured_result = $stmt->get_result();
+                // Lấy danh sách game với phân trang
+                $featured_query = "SELECT * FROM games ORDER BY created_at DESC LIMIT ? OFFSET ?";
+                $stmt = $conn->prepare($featured_query);
+                $stmt->bind_param("ii", $per_page, $offset);
+                $stmt->execute();
+                $featured_result = $stmt->get_result();
 
-        if ($featured_result->num_rows > 0):
-            while ($game = $featured_result->fetch_assoc()):
-                $gameImage = getGameImage($game['title']);
-                ?>
+                if ($featured_result->num_rows > 0):
+                    while ($game = $featured_result->fetch_assoc()):
+                        $thumbnail = getGameImage($game['title']);
+                        ?>
+
                 <a href="game.php?id=<?php echo $game['id']; ?>" class="game-card">
-                    <img src="<?php echo $gameImage; ?>" alt="<?php echo htmlspecialchars($game['title']); ?>"
-                        class="game-image">
+                    <img src="<?php echo htmlspecialchars($thumbnail); ?>"
+                        alt="<?php echo htmlspecialchars($game['title']); ?>" loading="lazy">
                     <h3 class="game-title"><?php echo htmlspecialchars($game['title']); ?></h3>
                     <div class="game-overlay">
                         <div class="play-text">Chơi Ngay</div>
                     </div>
                 </a>
                 <?php
-            endwhile;
-        else:
-            ?>
+                    endwhile;
+                else:
+                    ?>
                 <p>Chưa có game nổi bật.</p>
                 <?php endif; ?>
             </div>
@@ -642,18 +651,18 @@ $user = optionalAuth();
 
                 <!-- Hiển thị số trang -->
                 <?php
-        $max_visible_pages = 3; // Số trang tối đa hiển thị trước khi thêm dấu "..."
-        $start_page = max(1, $page - 1);
-        $end_page = min($total_pages, $start_page + $max_visible_pages - 1);
+                    $max_visible_pages = 3; // Số trang tối đa hiển thị trước khi thêm dấu "..."
+                    $start_page = max(1, $page - 1);
+                    $end_page = min($total_pages, $start_page + $max_visible_pages - 1);
 
-        // Điều chỉnh start_page nếu gần cuối
-        if ($end_page - $start_page + 1 < $max_visible_pages) {
-            $start_page = max(1, $end_page - $max_visible_pages + 1);
-        }
+                    // Điều chỉnh start_page nếu gần cuối
+                    if ($end_page - $start_page + 1 < $max_visible_pages) {
+                        $start_page = max(1, $end_page - $max_visible_pages + 1);
+                    }
 
-        // Hiển thị các số trang
-        for ($i = $start_page; $i <= $end_page; $i++):
-            ?>
+                    // Hiển thị các số trang
+                    for ($i = $start_page; $i <= $end_page; $i++):
+                        ?>
                 <a href="?page=<?php echo $i; ?>" class="page-link <?php echo ($i === $page) ? 'active' : ''; ?>">
                     <?php echo $i; ?>
                 </a>

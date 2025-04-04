@@ -10,10 +10,30 @@ include_once 'auth_check.php';
 
 // Lấy thông tin người dùng đã đăng nhập (nếu có)
 $user = optionalAuth();
+// Thêm hàm getGameImage vào đầu file header.php (sau các include)
+function getGameImage($title)
+{
+    // Chuẩn hóa tên file từ title (loại bỏ ký tự đặc biệt, khoảng trắng)
+    $filename = strtolower(str_replace(' ', ' ', $title)) . '.jpg';
+
+    // Đường dẫn đến thư mục chứa ảnh game
+    $image_path = './assets/image_games/' . $filename;
+
+    // Đường dẫn đến ảnh mặc định
+    $default_image = './assets/image_games/default-game.png';
+
+    // Kiểm tra xem file ảnh có tồn tại không
+    if (file_exists($image_path)) {
+        return $image_path;
+    }
+
+    // Trả về ảnh mặc định nếu không tìm thấy ảnh game
+    return $default_image;
+}
 
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id'];
-    $user_query = "SELECT id, username, avatar, role FROM users WHERE id = ?";
+    $user_query = "SELECT id, username, avatar, role, gender FROM users WHERE id = ?";
     $stmt = $conn->prepare($user_query);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
@@ -22,6 +42,106 @@ if (isset($_SESSION['user_id'])) {
     $is_logged_in = true;
 } else {
     $is_logged_in = false;
+}
+
+// Hàm lấy avatar mặc định theo giới tính
+function getDefaultAvatarByGender($gender)
+{
+    switch ($gender) {
+        case 'male':
+            return './assets/image_avatars/male.jpg';
+        case 'female':
+            return './assets/image_avatars/female.png';
+        default:
+            return './assets/image_avatars/default-avatar.png';
+    }
+}
+
+// Hàm lấy đường dẫn avatar
+function getAvatarUrl($user_data)
+{
+    // Nếu user có avatar
+    if (!empty($user_data['avatar'])) {
+        $avatar_path = './assets/image_avatars/' . $user_data['avatar'];
+        // Kiểm tra file avatar có tồn tại
+        if (file_exists($avatar_path)) {
+            return $avatar_path;
+        }
+    }
+
+    // Nếu không có avatar hoặc file không tồn tại, lấy avatar mặc định theo giới tính
+    return getDefaultAvatarByGender($user_data['gender'] ?? 'other');
+}
+
+// Sửa lại phần xử lý tìm kiếm AJAX
+if (isset($_GET['action']) && $_GET['action'] === 'search') {
+    header('Content-Type: application/json');
+
+    try {
+        $query = isset($_GET['q']) ? trim($_GET['q']) : '';
+
+        if (empty($query)) {
+            echo json_encode([]);
+            exit;
+        }
+
+        // Debug: In ra query để kiểm tra
+        error_log("Đang tìm kiếm game: " . $query);
+
+        // Chỉ tìm kiếm theo tên game
+        $sql = "SELECT g.id, g.title, c.name as category_name 
+                FROM games g 
+                LEFT JOIN categories c ON g.category_id = c.id 
+                WHERE LOWER(g.title) LIKE LOWER(?)
+                ORDER BY 
+                    CASE 
+                        WHEN LOWER(g.title) = LOWER(?) THEN 1
+                        WHEN LOWER(g.title) LIKE LOWER(?) THEN 2
+                        ELSE 3 
+                    END,
+                    g.title ASC 
+                LIMIT 10";
+
+        $searchTerm = "%{$query}%";
+        $exactMatch = $query;
+        $startsWith = "{$query}%";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sss", $searchTerm, $exactMatch, $startsWith);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $games = [];
+
+        while ($row = $result->fetch_assoc()) {
+            // Debug: In ra thông tin game
+            error_log("Game found: " . $row['title']);
+            
+            // Lấy đường dẫn hình ảnh dựa trên tên game
+            $thumbnail = getGameImage($row['title']);
+            
+            $games[] = [
+                'id' => $row['id'],
+                'title' => htmlspecialchars($row['title']),
+                'thumbnail' => $thumbnail,
+                'category' => htmlspecialchars($row['category_name'])
+            ];
+        }
+
+        if (empty($games)) {
+            echo json_encode(['error' => 'no_results', 'message' => 'Không tìm thấy game']);
+            exit;
+        }
+
+        echo json_encode($games);
+        exit;
+
+    } catch (Exception $e) {
+        error_log("Lỗi tìm kiếm: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'search_error', 'message' => 'Đã xảy ra lỗi khi tìm kiếm']);
+        exit;
+    }
 }
 ?>
 
@@ -69,6 +189,7 @@ if (isset($_SESSION['user_id'])) {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        background: white;
     }
 
     .header-left {
@@ -133,10 +254,10 @@ if (isset($_SESSION['user_id'])) {
     }
 
     .search-box {
+        position: relative;
         display: flex;
         align-items: center;
         background: rgba(255, 255, 255, 0.2);
-        /* Hiệu ứng kính mờ */
         border: 1px solid rgba(255, 255, 255, 0.3);
         border-radius: 25px;
         padding: 8px 20px;
@@ -144,6 +265,34 @@ if (isset($_SESSION['user_id'])) {
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         backdrop-filter: blur(5px);
         transition: all 0.3s ease;
+    }
+
+    /* Style cho dropdown sheet */
+    .search-results {
+        display: none;
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        width: 100%;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-height: 400px;
+        overflow-y: auto;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .search-results.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .search-results-content {
+        padding: 15px;
     }
 
     .search-box:hover {
@@ -172,6 +321,94 @@ if (isset($_SESSION['user_id'])) {
 
     .search-box button:hover {
         transform: scale(1.1);
+    }
+
+    /* Thêm/cập nhật các styles sau vào phần CSS */
+    .search-game-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .search-game-item:last-child {
+        border-bottom: none;
+    }
+
+    .search-game-item:hover {
+        background-color: rgba(248, 249, 250, 0);
+        transform: translateX(5px);
+        text-decoration: none;
+    }
+
+    .search-game-thumbnail {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin-right: 15px;
+        border: 1px solid #eee;
+    }
+
+    .search-game-title {
+        flex: 1;
+        overflow: hidden;
+        font-size: 17px;
+    }
+
+    .game-title {
+        font-weight: 500;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 5px;
+
+    }
+
+
+
+
+
+    .no-results {
+        text-align: center;
+        padding: 30px 20px;
+        color: #666;
+    }
+
+    .no-results i {
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .loading-indicator {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+
+    .loading-indicator i {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    /* Custom scrollbar cho search results */
+    .search-results::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .search-results::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .search-results::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .search-results::-webkit-scrollbar-thumb:hover {
+        background: #555;
     }
 
     .header-right {
@@ -380,8 +617,14 @@ if (isset($_SESSION['user_id'])) {
                     <img src="./assets/image_web/logo.png" alt="Logo">
                 </a>
                 <div class="search-box">
-                    <input type="text" placeholder="Tìm kiếm 90 000 game của chúng tôi">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm 90 000 game của chúng tôi"
+                        autocomplete="off">
                     <button type="submit"><i class="fas fa-search"></i></button>
+                    <div class="search-results" id="searchResults">
+                        <div class="search-results-content">
+                            <!-- Kết quả tìm kiếm sẽ được thêm vào đây -->
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- Thay thế phần header-right trong header.php -->
@@ -399,18 +642,8 @@ if (isset($_SESSION['user_id'])) {
                 <?php if ($is_logged_in): ?>
                 <div class="user-menu" id="userMenu">
                     <div class="user-info">
-                        <img src="<?php
-                            if (!empty($user['avatar'])) {
-                                $avatar_path = './assets/image_avatars/' . $user['avatar'];
-                                if (file_exists($avatar_path)) {
-                                    echo $avatar_path;
-                                } else {
-                                    echo './assets/image_avatars/default-avatar.png';
-                                }
-                            } else {
-                                echo './assets/image_avatars/default-avatar.png';
-                            }
-                            ?>" alt="Avatar của <?php echo htmlspecialchars($user['username']); ?>"
+                        <img src="<?php echo htmlspecialchars(getAvatarUrl($user)); ?>"
+                            alt="Avatar của <?php echo htmlspecialchars($user['username'] ?? 'Người dùng'); ?>"
                             class="user-avatar">
                         <span class="user-name"><?php echo htmlspecialchars($user['username']); ?></span>
                         <i class="fas fa-chevron-down dropdown-arrow"></i>
@@ -478,6 +711,94 @@ if (isset($_SESSION['user_id'])) {
                 }
             });
         }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const searchResultsContent = searchResults.querySelector('.search-results-content');
+        let searchTimeout;
+
+        async function searchGames(query) {
+            try {
+                const response = await fetch(`header.php?action=search&q=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const data = await response.json();
+                searchResultsContent.innerHTML = '';
+
+                if (data.error) {
+                    searchResultsContent.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-search" style="font-size: 24px; color: #999; margin-bottom: 10px;"></i>
+                    <p>${data.message}</p>
+                </div>
+            `;
+                    return;
+                }
+
+                data.forEach(game => {
+                    const gameElement = `
+                <a href="game.php?id=${game.id}" class="search-game-item">
+                    <img src="${game.thumbnail}" 
+                         alt="${game.title}" 
+                         class="search-game-thumbnail" 
+                         onerror="this.onerror=null; this.src='./assets/image_games/default-game.png'">
+                    <div class="search-game-info">
+                        <div class="search-game-title">${game.title}</div>
+                    
+                    </div>
+                </a>
+            `;
+                    searchResultsContent.innerHTML += gameElement;
+                });
+            } catch (error) {
+                console.error('Search error:', error);
+                searchResultsContent.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-exclamation-circle" style="color: #dc3545; font-size: 24px; margin-bottom: 10px;"></i>
+                <p>Đã xảy ra lỗi khi tìm kiếm</p>
+            </div>
+        `;
+            }
+        }
+
+        // Xử lý input search với debounce
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+
+            if (query.length > 0) {
+                searchResults.classList.add('active');
+                searchResultsContent.innerHTML = `
+                <div class="loading-indicator">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Đang tìm kiếm...</p>
+                </div>
+            `;
+            } else {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchGames(query);
+            }, 300);
+        });
+
+        // Đóng dropdown khi click ra ngoài
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        // Mở lại dropdown khi focus vào input nếu có text
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length > 0) {
+                searchResults.classList.add('active');
+            }
+        });
     });
     </script>
 </body>
