@@ -1,16 +1,13 @@
 <?php
-// Chỉ khởi tạo session nếu chưa có session nào
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 include_once 'config.php';
 
-// Biến để kiểm tra xem người dùng đã đăng nhập hay chưa
 $is_logged_in = false;
 $auth = null;
 
-// Kiểm tra xem có access_token không
 if (isset($_COOKIE['access_token'])) {
     include_once 'refresh_token.php';
 
@@ -20,13 +17,19 @@ if (isset($_COOKIE['access_token'])) {
     if ($payload && $payload['type'] === 'access') {
         $is_logged_in = true;
         $auth = $payload;
+        // Kiểm tra và gia hạn token nếu cần
+        if (isset($payload['user_id'])) {
+            $renewal_result = checkAndRenewToken($payload['user_id']);
+            if ($renewal_result['renewed']) {
+                // Có thể log hoặc thông báo cho user biết token đã được gia hạn
+                error_log("Token của user {$payload['user_id']} đã được gia hạn tự động");
+            }
+        }
     }
 }
 
-// Hàm kiểm tra xác thực bắt buộc
 if (!function_exists('requireAuth')) {
-    function requireAuth()
-    {
+    function requireAuth() {
         global $is_logged_in;
 
         if (!$is_logged_in) {
@@ -36,10 +39,8 @@ if (!function_exists('requireAuth')) {
     }
 }
 
-// Hàm kiểm tra xác thực tùy chọn
 if (!function_exists('optionalAuth')) {
-    function optionalAuth()
-    {
+    function optionalAuth() {
         global $is_logged_in, $auth;
         return $is_logged_in ? $auth : null;
     }
