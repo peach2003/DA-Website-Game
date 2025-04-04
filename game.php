@@ -2,6 +2,8 @@
 session_start();
 require_once 'config.php';
 include 'refresh_token.php';
+
+include_once 'header.php';
 // Kiểm tra và lọc game_id
 $game_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$game_id) {
@@ -21,12 +23,12 @@ if (!$game) {
 
 // Lấy top 10 điểm cao nhất cho game này
 $scores_query = "
-    SELECT u.username, s.score, s.created_at
-    FROM scores s
-    JOIN users u ON s.user_id = u.id
-    WHERE s.game_id = ?
-    ORDER BY s.score DESC
-    LIMIT 10
+SELECT u.username, s.score, s.created_at
+FROM scores s
+JOIN users u ON s.user_id = u.id
+WHERE s.game_id = ?
+ORDER BY s.score DESC
+LIMIT 10
 ";
 
 $stmt = $conn->prepare($scores_query);
@@ -36,10 +38,10 @@ $scores_result = $stmt->get_result();
 
 // Lấy các tag của game
 $tags_query = "
-    SELECT t.name 
-    FROM tags t
-    JOIN game_tag gt ON t.id = gt.tag_id
-    WHERE gt.game_id = ?
+SELECT t.name
+FROM tags t
+JOIN game_tag gt ON t.id = gt.tag_id
+WHERE gt.game_id = ?
 ";
 $stmt = $conn->prepare($tags_query);
 $stmt->bind_param("i", $game_id);
@@ -57,7 +59,7 @@ $tags_result = $stmt->get_result();
     <style>
     body {
         margin: 0;
-        padding: 20px;
+        padding: 0;
         font-family: Arial, sans-serif;
         background: #f5f5f5;
         color: #333;
@@ -69,7 +71,22 @@ $tags_result = $stmt->get_result();
         gap: 20px;
         max-width: 1600px;
         margin: 0 auto;
+        padding: 120px 20px 20px 20px;
+        /* Tăng padding-top lên 120px */
+        position: relative;
+        /* Thêm position relative */
+        z-index: 1;
+        /* Đảm bảo container nằm dưới header */
     }
+
+    /* Thêm media query để điều chỉnh padding trên màn hình nhỏ */
+    @media (max-width: 768px) {
+        .container {
+            padding-top: 100px;
+            /* Giảm padding-top trên mobile */
+        }
+    }
+
 
     .game-section {
         flex: 2;
@@ -89,6 +106,10 @@ $tags_result = $stmt->get_result();
         border-radius: 15px;
         padding: 20px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* Căn giữa nội dung */
     }
 
     .game-title {
@@ -101,10 +122,17 @@ $tags_result = $stmt->get_result();
     iframe {
         border: none;
         width: 100%;
-        height: 600px;
+        height: 500px;
+        /* Giảm từ 600px xuống 500px */
         border-radius: 10px;
         background: #fff;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
+        /* Thêm max-width để giới hạn chiều rộng */
+        margin: 0 auto;
+        /* Căn giữa iframe */
+        display: block;
+        /* Đảm bảo margin auto hoạt động */
     }
 
     .score-section {
@@ -182,39 +210,41 @@ $tags_result = $stmt->get_result();
 
     .tags-container {
         background: #fff;
-        border-radius: 15px;
         padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
     }
 
     .tags-title {
-        font-size: 20px;
+        font-size: 18px;
         margin-bottom: 15px;
         color: #333;
-        text-align: center;
         font-weight: bold;
+        padding-left: 10px;
     }
 
     .tags-grid {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
+        padding: 0 10px;
     }
 
     .tag {
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 14px;
-        color: #fff;
+        display: inline-block;
+        padding: 13px 16px;
+        border-radius: 15px;
+        font-size: 15px;
+        color: #333;
         text-decoration: none;
-        background: #ff3e3e;
+        background: #fff;
         transition: all 0.3s ease;
+        border: 2px solid;
+        font-weight: 500;
     }
 
     .tag:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        background: #ff5555;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .login-prompt {
@@ -304,10 +334,39 @@ $tags_result = $stmt->get_result();
 
             <!-- Tags -->
             <div class="tags-container">
-                <h2 class="tags-title">Thẻ Game</h2>
+                <h2 class="tags-title">GẮN THẺ</h2>
                 <div class="tags-grid">
-                    <?php while ($tag = $tags_result->fetch_assoc()): ?>
-                    <a href="tags.php?tag=<?php echo urlencode($tag['name']); ?>" class="tag">
+                    <?php
+                    $usedColors = array();
+
+                    function getRandomColor($usedColors)
+                    {
+                        $colors = array(
+                            '#ff8c66', // Cam nhạt 
+                            '#ff66b3', // Hồng 
+                            '#cc66ff', // Tím 
+                            '#66ff99', // Xanh lá 
+                            '#66ccff', // Xanh lam 
+                            '#ff6666', // Đỏ 
+                            '#ffcc66'  // Vàng 
+                        );
+
+                        $availableColors = array_diff($colors, $usedColors);
+                        if (empty($availableColors)) {
+                            $usedColors = array(); // Reset used colors if all are used
+                            $availableColors = $colors;
+                        }
+
+                        $color = array_rand(array_flip($availableColors));
+                        $usedColors[] = $color;
+                        return $color;
+                    }
+
+                    while ($tag = $tags_result->fetch_assoc()):
+                        $borderColor = getRandomColor($usedColors);
+                        ?>
+                    <a href="tags.php?tag=<?php echo urlencode($tag['name']); ?>" class="tag"
+                        style="border-color: <?php echo $borderColor; ?>">
                         <?php echo htmlspecialchars($tag['name']); ?>
                     </a>
                     <?php endwhile; ?>
@@ -315,6 +374,10 @@ $tags_result = $stmt->get_result();
             </div>
         </div>
     </div>
+
+    <?php
+    include_once 'footer.php';
+    ?>
 
     <script>
     let gameFrame = document.getElementById('gameFrame');

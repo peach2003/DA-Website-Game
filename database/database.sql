@@ -19,6 +19,7 @@ CREATE TABLE user_tokens (
     access_token TEXT NOT NULL,
     refresh_token TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -44,7 +45,6 @@ CREATE TABLE games (
 CREATE TABLE tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    color VARCHAR(20) DEFAULT '#4CAF50'
 );
 
 -- Bảng trung gian game_tag (many-to-many giữa games và tags)

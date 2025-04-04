@@ -53,15 +53,10 @@ if (isset($_SESSION['user_id'])) {
     /* Header */
     header {
         background: rgba(255, 255, 255, 0.95);
-        /* Hiệu ứng kính mờ nhẹ */
-        padding: 15px 0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         position: fixed;
-        /* Cố định header */
         top: 0;
         left: 0;
         width: 100%;
-        /* Đảm bảo header chiếm toàn bộ chiều rộng */
         z-index: 1000;
         backdrop-filter: blur(10px);
         /* Hiệu ứng kính mờ */
