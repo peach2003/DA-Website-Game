@@ -28,7 +28,7 @@ CREATE TABLE user_tokens (
 -- Bảng categories
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
+    name VARCHAR(100) NOT NULL,
     title VARCHAR(255) DEFAULT NULL,
     content TEXT DEFAULT NULL
 
@@ -275,10 +275,5 @@ INSERT INTO game_tag (game_id, tag_id) VALUES
 (3, 8),
 (3, 9);
 
-INSERT INTO scores (id, user_id, game_id, score, created_at) VALUES
-(1, 1, 1, 3, '2025-04-02 09:43:24'),
-(8, 1, 3, 50, '2025-04-02 10:54:16'),
-(13, 2, 1, 6, '2025-04-03 08:54:51'),
-(39, 2, 2, 260, '2025-04-03 08:56:06'),
-(45, 2, 3, 20, '2025-04-03 08:56:27');
+
 

@@ -57,26 +57,26 @@ $stmt->bind_param("iii", $tag_id, $games_per_page, $offset);
 $stmt->execute();
 $games = $stmt->get_result();
 
-// Hàm lấy đường dẫn hình ảnh game
-function getGameImage($title)
-{
-    // Chuẩn hóa tên file từ title (loại bỏ ký tự đặc biệt, khoảng trắng)
-    $filename = strtolower(str_replace(' ', ' ', $title)) . '.jpg';
+// // Hàm lấy đường dẫn hình ảnh game
+// function getGameImage($title)
+// {
+//     // Chuẩn hóa tên file từ title (loại bỏ ký tự đặc biệt, khoảng trắng)
+//     $filename = strtolower(str_replace(' ', ' ', $title)) . '.jpg';
 
-    // Đường dẫn đến thư mục chứa ảnh game
-    $image_path = './assets/image_games/' . $filename;
+//     // Đường dẫn đến thư mục chứa ảnh game
+//     $image_path = './assets/image_games/' . $filename;
 
-    // Đường dẫn đến ảnh mặc định
-    $default_image = './assets/image_games/default-game.png';
+//     // Đường dẫn đến ảnh mặc định
+//     $default_image = './assets/image_games/default-game.png';
 
-    // Kiểm tra xem file ảnh có tồn tại không
-    if (file_exists($image_path)) {
-        return $image_path;
-    }
+//     // Kiểm tra xem file ảnh có tồn tại không
+//     if (file_exists($image_path)) {
+//         return $image_path;
+//     }
 
-    // Trả về ảnh mặc định nếu không tìm thấy ảnh game
-    return $default_image;
-}
+//     // Trả về ảnh mặc định nếu không tìm thấy ảnh game
+//     return $default_image;
+// }
 ?>
 
 <!DOCTYPE html>
