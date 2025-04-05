@@ -345,13 +345,13 @@ $popular_tags = $stmt->get_result();
         </div>
 
         <div class="games-grid">
-            <?php while ($game = $games->fetch_assoc()): ?>
+            <?php while ($game = $games->fetch_assoc()):
+                $thumbnail = getGameImage($game['title']); ?>
             <div class="game-card">
                 <a href="game.php?id=<?php echo $game['id']; ?>">
                     <div class="game-thumb">
-                        <img src="<?php echo htmlspecialchars($game['thumbnail']); ?>"
-                            alt="<?php echo htmlspecialchars($game['title']); ?>"
-                            onerror="this.src='assets/image_games/default-game.png'">
+                    <img src="<?php echo htmlspecialchars($thumbnail); ?>"
+                    alt="<?php echo htmlspecialchars($game['title']); ?>" loading="lazy">
                         <div class="game-overlay">
                             <h3 class="game-title"><?php echo htmlspecialchars($game['title']); ?></h3>
                         </div>
